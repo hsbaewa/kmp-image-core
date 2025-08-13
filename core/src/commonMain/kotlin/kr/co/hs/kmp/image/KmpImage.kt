@@ -19,7 +19,7 @@ object KmpImage {
 }
 
 expect fun ImageBitmap.toByteArray(
-    format: KmpImage.Format = KmpImage.Format.PNG,
+    format: KmpImage.Format = KmpImage.Format.JPEG,
     quality: Int = 100
 ): ByteArray?
 

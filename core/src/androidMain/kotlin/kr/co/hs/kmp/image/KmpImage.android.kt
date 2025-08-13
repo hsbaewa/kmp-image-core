@@ -3,6 +3,7 @@ package kr.co.hs.kmp.image
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import java.io.ByteArrayOutputStream
 
 actual fun ImageBitmap.toByteArray(
@@ -24,3 +25,9 @@ actual fun ImageBitmap.toByteArray(
 
     return stream.toByteArray()
 }
+
+fun Bitmap.toByteArray(
+    format: KmpImage.Format = KmpImage.Format.JPEG,
+    quality: Int = 100
+): ByteArray? = asImageBitmap()
+    .toByteArray(format, quality)
