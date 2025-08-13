@@ -8,6 +8,9 @@ plugins {
     // Maven publish
     alias(libs.plugins.maven.publish)
     id("signing") // GPG 서명을 위한 플러그인 추가
+
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
@@ -57,6 +60,7 @@ kotlin {
         commonMain {
             dependencies {
                 // Add KMP dependencies here
+                implementation(compose.ui)
             }
         }
 
@@ -87,10 +91,13 @@ kotlin {
 
 }
 
+val mavenCentralGroupId = "io.github.hsbaewa"
+val mavenCentralArtifactId = "kmp-image-core"
+val mavenCentralVersion = "0.0.2"
 
 // Maven 그룹 및 버전 설정
-group = "io.github.hsbaewa"
-version = "0.0.1"
+group = mavenCentralGroupId
+version = mavenCentralVersion
 
 tasks.withType(Javadoc::class) {
     options {
@@ -115,7 +122,11 @@ mavenPublishing {
 //    signAllPublications() // Gpg 서명을 위한 설정
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL) // 포탈로 등록 할거기 때문에 타입 추가
 
-    coordinates("io.github.hsbaewa", "kmp-image-core", "0.0.1") // 네임 스페이스, 라이브러리 이름, 버전 순서로 작성
+    coordinates(
+        mavenCentralGroupId,
+        mavenCentralArtifactId,
+        mavenCentralVersion
+    ) // 네임 스페이스, 라이브러리 이름, 버전 순서로 작성
 
     // POM 설정
     pom {
@@ -124,16 +135,16 @@ mavenPublishing {
         description = '[라이브러리 설명]'
         url = '[오픈소스 Repository Url]'
          */
-        name = "kmp-image-core"
+        name = mavenCentralArtifactId
         description = "KMP Image Library"
-        url = "https://github.com/hsbaewa/kmp-image-core"
+        url = "https://github.com/hsbaewa/$mavenCentralArtifactId"
         inceptionYear = "2025"
 
         // 라이선스 정보
         licenses {
             license {
                 name = "Apache License"
-                url = "https://github.com/hsbaewa/kmp-image-core/blob/main/LICENSE"
+                url = "https://github.com/hsbaewa/$mavenCentralArtifactId/blob/main/LICENSE"
             }
         }
 
@@ -153,9 +164,9 @@ mavenPublishing {
         url = '<https://github.com/>[Github 사용자명]/[오픈소스 Repository 이름]/tree/[배포 브랜치명]'
          */
         scm {
-            connection = "scm:git:github.com/hsbaewa/kmp-image-core.git"
-            developerConnection = "scm:git:ssh://github.com:hsbaewa/kmp-image-core.git"
-            url = "https://github.com/hsbaewa/kmp-image-core/tree/main"
+            connection = "scm:git:github.com/hsbaewa/$mavenCentralArtifactId"
+            developerConnection = "scm:git:ssh://github.com:hsbaewa/$mavenCentralArtifactId.git"
+            url = "https://github.com/hsbaewa/$mavenCentralArtifactId/tree/main"
         }
     }
 }
