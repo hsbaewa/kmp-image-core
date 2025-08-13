@@ -1,11 +1,13 @@
 package kr.co.hs.kmp.image
 
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
+import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.ColorType
@@ -24,6 +26,7 @@ import platform.Foundation.NSData
 import platform.Foundation.dataWithBytes
 import platform.UIKit.UIImage
 import platform.posix.memcpy
+import kotlin.math.roundToInt
 
 actual fun ImageBitmap.toByteArray(
     format: KmpImage.Format,
@@ -95,3 +98,28 @@ fun ByteArray.toNSData(): NSData = usePinned { pinned ->
 }
 
 fun NSData.toUIImage(): UIImage? = UIImage.imageWithData(this)
+
+actual fun ImageBitmap.crop(
+    rect: Rect
+): ImageBitmap = Image
+    .makeFromBitmap(
+        bitmap = Bitmap()
+            .apply {
+                allocN32Pixels(
+                    width = rect.width.roundToInt(),
+                    height = rect.height.roundToInt()
+                )
+            }
+            .apply {
+                Image
+                    .makeFromBitmap(
+                        bitmap = asSkiaBitmap()
+                    )
+                    .readPixels(
+                        dst = this,
+                        srcX = -rect.left.roundToInt(),
+                        srcY = -rect.top.roundToInt()
+                    )
+            }
+    )
+    .toComposeImageBitmap()

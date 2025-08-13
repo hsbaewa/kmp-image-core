@@ -1,6 +1,7 @@
 package kr.co.hs.kmp.image
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
@@ -73,3 +74,5 @@ fun Painter.toImageBitmap(
     }
     return image
 }
+
+expect fun ImageBitmap.crop(rect: Rect): ImageBitmap

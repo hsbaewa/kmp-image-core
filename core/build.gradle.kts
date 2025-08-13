@@ -94,7 +94,7 @@ kotlin {
 
 val mavenCentralGroupId = "io.github.hsbaewa"
 val mavenCentralArtifactId = "kmp-image-core"
-val mavenCentralVersion = "0.0.4"
+val mavenCentralVersion = "0.0.5"
 
 // Maven 그룹 및 버전 설정
 group = mavenCentralGroupId
