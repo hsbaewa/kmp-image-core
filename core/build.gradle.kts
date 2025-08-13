@@ -61,6 +61,7 @@ kotlin {
             dependencies {
                 // Add KMP dependencies here
                 implementation(compose.ui)
+                implementation(compose.components.resources)
             }
         }
 

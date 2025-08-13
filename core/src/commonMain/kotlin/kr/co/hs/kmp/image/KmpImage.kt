@@ -10,14 +10,46 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
+
+object KmpImage {
+    enum class Format { PNG, JPEG, WEBP }
+}
+
+expect fun ImageBitmap.toByteArray(
+    format: KmpImage.Format = KmpImage.Format.PNG,
+    quality: Int = 100
+): ByteArray?
+
+@Composable
+fun painterResourceToImageBitmap(
+    resource: DrawableResource,
+    layoutDirection: LayoutDirection = LayoutDirection.Ltr,
+    config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
+): ImageBitmap = painterResource(resource = resource)
+    .run {
+        toImageBitmap(
+            layoutDirection = layoutDirection,
+            size = intrinsicSize,
+            config = config
+        )
+    }
 
 @Composable
 fun Painter.toImageBitmap(
     layoutDirection: LayoutDirection = LayoutDirection.Ltr,
     size: Size = intrinsicSize,
     config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
-): ImageBitmap = with(LocalDensity.current) { toImageBitmap(this) }
+): ImageBitmap = with(LocalDensity.current) {
+    toImageBitmap(
+        density = this,
+        layoutDirection = layoutDirection,
+        size = size,
+        config = config
+    )
+}
 
 fun Painter.toImageBitmap(
     density: Density,
