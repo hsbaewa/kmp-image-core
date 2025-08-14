@@ -1,9 +1,11 @@
 package kr.co.hs.kmp.image
 
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
@@ -22,8 +24,13 @@ import platform.CoreGraphics.CGImageGetBytesPerRow
 import platform.CoreGraphics.CGImageGetDataProvider
 import platform.CoreGraphics.CGImageGetHeight
 import platform.CoreGraphics.CGImageGetWidth
+import platform.CoreGraphics.CGRectMake
+import platform.CoreGraphics.CGSize
+import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSData
 import platform.Foundation.dataWithBytes
+import platform.UIKit.UIGraphicsBeginImageContextWithOptions
+import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
 import platform.UIKit.UIImage
 import platform.posix.memcpy
 import kotlin.math.roundToInt
@@ -123,3 +130,39 @@ actual fun ImageBitmap.crop(
             }
     )
     .toComposeImageBitmap()
+
+@OptIn(ExperimentalForeignApi::class)
+actual fun ImageBitmap.scale(
+    size: Size,
+    format: KmpImage.Format,
+    quality: Int
+): ImageBitmap {
+    val srcUIImage = this.asUIImage(
+        format = format,
+        quality = quality
+    )!!
+
+    UIGraphicsBeginImageContextWithOptions(
+        size = size.toCGSize(),
+        opaque = false,
+        srcUIImage.scale
+    )
+
+    srcUIImage
+        .drawInRect(
+            CGRectMake(
+                x = 0.0,
+                y = 0.0,
+                width = size.width.toDouble(),
+                height = size.height.toDouble()
+            )
+        )
+
+    val scaledUIImage = UIGraphicsGetImageFromCurrentImageContext()
+    return scaledUIImage!!.asImageBitmap()!!
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private fun Size.toCGSize(): CValue<CGSize> {
+    return CGSizeMake(width.toDouble(), height.toDouble())
+}

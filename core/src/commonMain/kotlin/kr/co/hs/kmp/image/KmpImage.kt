@@ -75,4 +75,12 @@ fun Painter.toImageBitmap(
     return image
 }
 
-expect fun ImageBitmap.crop(rect: Rect): ImageBitmap
+expect fun ImageBitmap.crop(
+    rect: Rect
+): ImageBitmap
+
+expect fun ImageBitmap.scale(
+    size: Size,
+    format: KmpImage.Format,
+    quality: Int = 100
+): ImageBitmap

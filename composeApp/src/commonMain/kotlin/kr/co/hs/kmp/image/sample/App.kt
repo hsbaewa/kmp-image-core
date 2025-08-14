@@ -13,11 +13,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.painterResource
+import androidx.compose.ui.geometry.Size
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import kmpimagecore.composeapp.generated.resources.Res
 import kmpimagecore.composeapp.generated.resources.compose_multiplatform
+import kr.co.hs.kmp.image.KmpImage
+import kr.co.hs.kmp.image.painterResourceToImageBitmap
+import kr.co.hs.kmp.image.scale
 
 @Composable
 @Preview
@@ -40,7 +43,15 @@ fun App() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
+                    Image(
+                        bitmap = painterResourceToImageBitmap(Res.drawable.compose_multiplatform)
+                            .scale(
+                                size = Size(200f, 200f),
+                                format = KmpImage.Format.PNG,
+                                quality = 50
+                            ),
+                        null
+                    )
                     Text("Compose: $greeting")
                 }
             }
