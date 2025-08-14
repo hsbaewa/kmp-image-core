@@ -20,6 +20,7 @@ import org.jetbrains.skia.Image
 import org.jetbrains.skia.ImageInfo
 import platform.CoreFoundation.CFDataGetBytePtr
 import platform.CoreFoundation.CFDataGetLength
+import platform.CoreGraphics.CGBlendMode
 import platform.CoreGraphics.CGContextClipToMask
 import platform.CoreGraphics.CGDataProviderCopyData
 import platform.CoreGraphics.CGImageGetBytesPerRow
@@ -210,4 +211,51 @@ actual fun ImageBitmap.mask(
     val maskingUIImage = UIGraphicsGetImageFromCurrentImageContext()
     UIGraphicsEndImageContext()
     return maskingUIImage!!.asImageBitmap()!!
+}
+
+@OptIn(ExperimentalForeignApi::class)
+actual fun ImageBitmap.draw(
+    image: ImageBitmap,
+    rect: Rect,
+    format: KmpImage.Format,
+    quality: Int
+): ImageBitmap {
+    val srcImage = asUIImage(
+        format = format,
+        quality = quality
+    )!!
+    val srcImageWidth = srcImage.size.useContents { this.width }
+    val srcImageHeight = srcImage.size.useContents { this.height }
+
+    val cgRect = CGRectMake(
+        x = 0.0,
+        y = 0.0,
+        width = srcImageWidth,
+        height = srcImageHeight
+    )
+    UIGraphicsBeginImageContextWithOptions(
+        size = srcImage.size,
+        opaque = false,
+        scale = srcImage.scale
+    )
+    srcImage.drawInRect(cgRect)
+
+    val area = CGRectMake(
+        x = rect.left.toDouble(),
+        y = rect.top.toDouble(),
+        width = rect.width.toDouble(),
+        height = rect.height.toDouble()
+    )
+    val destImage = image.asUIImage(
+        format = format,
+        quality = quality
+    )!!
+    destImage.drawInRect(
+        rect = area,
+        blendMode = CGBlendMode.kCGBlendModeNormal,
+        alpha = 1.0
+    )
+
+    val result = UIGraphicsGetImageFromCurrentImageContext()
+    return result!!.asImageBitmap()!!
 }

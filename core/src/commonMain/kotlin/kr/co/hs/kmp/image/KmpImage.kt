@@ -90,3 +90,10 @@ expect fun ImageBitmap.mask(
     format: KmpImage.Format,
     quality: Int = 100
 ): ImageBitmap
+
+expect fun ImageBitmap.draw(
+    image: ImageBitmap,
+    rect: Rect,
+    format: KmpImage.Format,
+    quality: Int = 100
+): ImageBitmap

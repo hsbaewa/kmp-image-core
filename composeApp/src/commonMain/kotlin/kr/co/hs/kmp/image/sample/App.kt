@@ -13,14 +13,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import kmpimagecore.composeapp.generated.resources.Res
 import kmpimagecore.composeapp.generated.resources.compose_multiplatform
 import kmpimagecore.composeapp.generated.resources.frame_mainprofile_mobile_defaultarea_full
+import kmpimagecore.composeapp.generated.resources.frame_mainprofile_pc
 import kmpimagecore.composeapp.generated.resources.frame_mainprofile_pc_photoarea
 import kr.co.hs.kmp.image.KmpImage
+import kr.co.hs.kmp.image.draw
 import kr.co.hs.kmp.image.mask
 import kr.co.hs.kmp.image.painterResourceToImageBitmap
 import kr.co.hs.kmp.image.scale
@@ -61,9 +65,22 @@ fun App() {
                     val profileImage =
                         painterResourceToImageBitmap(Res.drawable.frame_mainprofile_mobile_defaultarea_full)
                             .mask(maskImage, format = KmpImage.Format.PNG)
+                    val frameImage = imageResource(Res.drawable.frame_mainprofile_pc)
+                    val rect = Rect(
+                        offset = Offset(0f, 0f),
+                        size = Size(
+                            frameImage.width.toFloat(),
+                            frameImage.height.toFloat()
+                        )
+                    )
+                    val framedImage = profileImage.draw(
+                        frameImage,
+                        rect,
+                        KmpImage.Format.PNG
+                    )
 
                     Image(
-                        bitmap = profileImage,
+                        bitmap = framedImage,
                         ""
                     )
 

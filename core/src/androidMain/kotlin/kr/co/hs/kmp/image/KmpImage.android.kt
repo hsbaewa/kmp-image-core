@@ -146,3 +146,44 @@ actual fun ImageBitmap.mask(
 
     return result.asImageBitmap()
 }
+
+actual fun ImageBitmap.draw(
+    image: ImageBitmap,
+    rect: Rect,
+    format: KmpImage.Format,
+    quality: Int
+): ImageBitmap {
+    val srcByteArray = toByteArray(
+        format = format,
+        quality = quality
+    )!!
+    val srcBitmap = BitmapFactory.decodeByteArray(
+        srcByteArray,
+        0,
+        srcByteArray.size
+    )
+
+    val bitmap = createBitmap(srcBitmap.width, srcBitmap.height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    canvas.drawBitmap(srcBitmap, 0f, 0f, null)
+
+    val destByteArray = image.toByteArray(
+        format = format,
+        quality = quality
+    )!!
+    val destBitmap = BitmapFactory.decodeByteArray(
+        destByteArray,
+        0,
+        destByteArray.size
+    )
+    val destScaledBitmap = Bitmap.createScaledBitmap(
+        destBitmap,
+        rect.width.roundToInt(),
+        rect.height.roundToInt(),
+        false
+    )
+
+    canvas.drawBitmap(destScaledBitmap, rect.left, rect.top, null)
+
+    return bitmap.asImageBitmap()
+}
