@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ColorAlphaType
@@ -19,6 +20,7 @@ import org.jetbrains.skia.Image
 import org.jetbrains.skia.ImageInfo
 import platform.CoreFoundation.CFDataGetBytePtr
 import platform.CoreFoundation.CFDataGetLength
+import platform.CoreGraphics.CGContextClipToMask
 import platform.CoreGraphics.CGDataProviderCopyData
 import platform.CoreGraphics.CGImageGetBytesPerRow
 import platform.CoreGraphics.CGImageGetDataProvider
@@ -30,6 +32,8 @@ import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSData
 import platform.Foundation.dataWithBytes
 import platform.UIKit.UIGraphicsBeginImageContextWithOptions
+import platform.UIKit.UIGraphicsEndImageContext
+import platform.UIKit.UIGraphicsGetCurrentContext
 import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
 import platform.UIKit.UIImage
 import platform.posix.memcpy
@@ -145,7 +149,7 @@ actual fun ImageBitmap.scale(
     UIGraphicsBeginImageContextWithOptions(
         size = size.toCGSize(),
         opaque = false,
-        srcUIImage.scale
+        scale = srcUIImage.scale
     )
 
     srcUIImage
@@ -165,4 +169,45 @@ actual fun ImageBitmap.scale(
 @OptIn(ExperimentalForeignApi::class)
 private fun Size.toCGSize(): CValue<CGSize> {
     return CGSizeMake(width.toDouble(), height.toDouble())
+}
+
+@OptIn(ExperimentalForeignApi::class)
+actual fun ImageBitmap.mask(
+    mask: ImageBitmap,
+    format: KmpImage.Format,
+    quality: Int
+): ImageBitmap {
+    val maskUIImage = mask.asUIImage(
+        format = format,
+        quality = quality
+    )!!
+
+    val maskWidth = maskUIImage.size.useContents { this.width }
+    val maskHeight = maskUIImage.size.useContents { this.height }
+
+    val srcUIImage = this.asUIImage(
+        format = format,
+        quality = quality
+    )!!
+
+    UIGraphicsBeginImageContextWithOptions(
+        size = maskUIImage.size,
+        opaque = false,
+        scale = maskUIImage.scale
+    )
+    val context = UIGraphicsGetCurrentContext()
+
+    val maskRect = CGRectMake(
+        x = 0.0,
+        y = 0.0,
+        width = maskWidth,
+        height = maskHeight
+    )
+
+    CGContextClipToMask(context, maskRect, maskUIImage.CGImage)
+    srcUIImage.drawInRect(maskRect)
+
+    val maskingUIImage = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+    return maskingUIImage!!.asImageBitmap()!!
 }

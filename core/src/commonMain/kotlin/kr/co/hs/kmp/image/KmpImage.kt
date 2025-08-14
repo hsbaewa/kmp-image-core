@@ -84,3 +84,9 @@ expect fun ImageBitmap.scale(
     format: KmpImage.Format,
     quality: Int = 100
 ): ImageBitmap
+
+expect fun ImageBitmap.mask(
+    mask: ImageBitmap,
+    format: KmpImage.Format,
+    quality: Int = 100
+): ImageBitmap

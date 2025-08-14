@@ -18,9 +18,13 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import kmpimagecore.composeapp.generated.resources.Res
 import kmpimagecore.composeapp.generated.resources.compose_multiplatform
+import kmpimagecore.composeapp.generated.resources.frame_mainprofile_mobile_defaultarea_full
+import kmpimagecore.composeapp.generated.resources.frame_mainprofile_pc_photoarea
 import kr.co.hs.kmp.image.KmpImage
+import kr.co.hs.kmp.image.mask
 import kr.co.hs.kmp.image.painterResourceToImageBitmap
 import kr.co.hs.kmp.image.scale
+import org.jetbrains.compose.resources.imageResource
 
 @Composable
 @Preview
@@ -52,6 +56,17 @@ fun App() {
                             ),
                         null
                     )
+
+                    val maskImage = imageResource(Res.drawable.frame_mainprofile_pc_photoarea)
+                    val profileImage =
+                        painterResourceToImageBitmap(Res.drawable.frame_mainprofile_mobile_defaultarea_full)
+                            .mask(maskImage, format = KmpImage.Format.PNG)
+
+                    Image(
+                        bitmap = profileImage,
+                        ""
+                    )
+
                     Text("Compose: $greeting")
                 }
             }
